@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+# 민감 정보가 포함된 로컬 설정 파일
+/src/main/resources/secret-application.properties
