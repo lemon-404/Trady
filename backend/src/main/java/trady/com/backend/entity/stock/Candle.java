@@ -44,7 +44,6 @@ public class Candle {
     @Column(name = "low_price", nullable = false)
     private int lowPrice;
 
-
     @Column(name = "close_price", nullable = false)
     private int closePrice;
 
@@ -61,5 +60,22 @@ public class Candle {
         this.lowPrice = lowPrice;
         this.closePrice = closePrice;
         this.volume = volume;
+    }
+
+    public boolean hasSameOhlcv(Candle other) {
+        return openPrice == other.openPrice
+                && highPrice == other.highPrice
+                && lowPrice == other.lowPrice
+                && closePrice == other.closePrice
+                && volume.equals(other.volume);
+    }
+
+    /** 기존 캔들의 식별값은 유지하고 OHLCV만 변경한다. */
+    public void updateOhlcv(Candle other) {
+        this.openPrice = other.openPrice;
+        this.highPrice = other.highPrice;
+        this.lowPrice = other.lowPrice;
+        this.closePrice = other.closePrice;
+        this.volume = other.volume;
     }
 }
