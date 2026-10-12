@@ -3,14 +3,14 @@ package trady.com.backend.entity.trading;
 import jakarta.persistence.*;
 import lombok.*;
 import trady.com.backend.entity.member.Account;
-import trady.com.backend.entity.stock.Stock;
+import trady.com.backend.stock.entity.Stock;
 import trady.com.backend.entity.trading.Enum.OrderType;
 import trady.com.backend.entity.trading.Enum.Side;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

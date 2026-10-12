@@ -1,0 +1,169 @@
+{
+  "repositoryVersion" : "CandleQueryRepositoryV1",
+  "serviceVersion" : "CandleQueryServiceV1",
+  "measuredAt" : "2026-10-14T09:06:45.5686063+09:00",
+  "measurementScope" : "service",
+  "results" : [ {
+    "stockCode" : "005930",
+    "interval" : "1",
+    "pageSize" : 390,
+    "warmupCount" : 3,
+    "cursor" : "2026-10-09T23:59:59",
+    "measurementCount" : 10,
+    "requests" : [ {
+      "returnedCount" : 390,
+      "sequence" : 1,
+      "elapsedMs" : 108.9983
+    }, {
+      "returnedCount" : 390,
+      "sequence" : 2,
+      "elapsedMs" : 110.4687
+    }, {
+      "returnedCount" : 390,
+      "sequence" : 3,
+      "elapsedMs" : 116.2531
+    }, {
+      "returnedCount" : 390,
+      "sequence" : 4,
+      "elapsedMs" : 103.4217
+    }, {
+      "returnedCount" : 390,
+      "sequence" : 5,
+      "elapsedMs" : 109.0317
+    }, {
+      "returnedCount" : 390,
+      "sequence" : 6,
+      "elapsedMs" : 104.65
+    }, {
+      "returnedCount" : 390,
+      "sequence" : 7,
+      "elapsedMs" : 98.5267
+    }, {
+      "returnedCount" : 390,
+      "sequence" : 8,
+      "elapsedMs" : 108.9468
+    }, {
+      "returnedCount" : 390,
+      "sequence" : 9,
+      "elapsedMs" : 103.9167
+    }, {
+      "returnedCount" : 390,
+      "sequence" : 10,
+      "elapsedMs" : 109.4454
+    } ],
+    "statistics" : {
+      "medianMs" : 108.97255,
+      "maxMs" : 116.2531,
+      "averageMs" : 107.36591000000001,
+      "totalMs" : 1073.6591
+    }
+  }, {
+    "stockCode" : "005930",
+    "interval" : "5",
+    "pageSize" : 78,
+    "warmupCount" : 3,
+    "cursor" : "2026-10-09T23:59:59",
+    "measurementCount" : 10,
+    "requests" : [ {
+      "returnedCount" : 78,
+      "sequence" : 1,
+      "elapsedMs" : 21.0526
+    }, {
+      "returnedCount" : 78,
+      "sequence" : 2,
+      "elapsedMs" : 19.1709
+    }, {
+      "returnedCount" : 78,
+      "sequence" : 3,
+      "elapsedMs" : 20.0527
+    }, {
+      "returnedCount" : 78,
+      "sequence" : 4,
+      "elapsedMs" : 21.172
+    }, {
+      "returnedCount" : 78,
+      "sequence" : 5,
+      "elapsedMs" : 21.2768
+    }, {
+      "returnedCount" : 78,
+      "sequence" : 6,
+      "elapsedMs" : 21.3141
+    }, {
+      "returnedCount" : 78,
+      "sequence" : 7,
+      "elapsedMs" : 23.7795
+    }, {
+      "returnedCount" : 78,
+      "sequence" : 8,
+      "elapsedMs" : 21.9832
+    }, {
+      "returnedCount" : 78,
+      "sequence" : 9,
+      "elapsedMs" : 19.3686
+    }, {
+      "returnedCount" : 78,
+      "sequence" : 10,
+      "elapsedMs" : 23.4996
+    } ],
+    "statistics" : {
+      "medianMs" : 21.224400000000003,
+      "maxMs" : 23.7795,
+      "averageMs" : 21.267000000000003,
+      "totalMs" : 212.67000000000002
+    }
+  }, {
+    "stockCode" : "005930",
+    "interval" : "15",
+    "pageSize" : 26,
+    "warmupCount" : 3,
+    "cursor" : "2026-10-09T23:59:59",
+    "measurementCount" : 10,
+    "requests" : [ {
+      "returnedCount" : 26,
+      "sequence" : 1,
+      "elapsedMs" : 7.9063
+    }, {
+      "returnedCount" : 26,
+      "sequence" : 2,
+      "elapsedMs" : 8.3889
+    }, {
+      "returnedCount" : 26,
+      "sequence" : 3,
+      "elapsedMs" : 10.0262
+    }, {
+      "returnedCount" : 26,
+      "sequence" : 4,
+      "elapsedMs" : 10.0873
+    }, {
+      "returnedCount" : 26,
+      "sequence" : 5,
+      "elapsedMs" : 8.3715
+    }, {
+      "returnedCount" : 26,
+      "sequence" : 6,
+      "elapsedMs" : 17.5039
+    }, {
+      "returnedCount" : 26,
+      "sequence" : 7,
+      "elapsedMs" : 6.5619
+    }, {
+      "returnedCount" : 26,
+      "sequence" : 8,
+      "elapsedMs" : 7.1298
+    }, {
+      "returnedCount" : 26,
+      "sequence" : 9,
+      "elapsedMs" : 7.0161
+    }, {
+      "returnedCount" : 26,
+      "sequence" : 10,
+      "elapsedMs" : 7.4694
+    } ],
+    "statistics" : {
+      "medianMs" : 8.1389,
+      "maxMs" : 17.5039,
+      "averageMs" : 9.046130000000002,
+      "totalMs" : 90.46130000000001
+    }
+  } ]
+}
