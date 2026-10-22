@@ -4,13 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import trady.com.backend.candle.dto.CandleContinuousQueryRequest;
 import trady.com.backend.candle.dto.CandleContinuousQueryResponse;
 import trady.com.backend.candle.service.CandleQueryServiceV1;
 
 
-@RestController("v1/stock/candle")
+@RestController
+@RequestMapping("v1/stock/candle")
 @RequiredArgsConstructor
 public class CandleController {
 

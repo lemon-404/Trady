@@ -1,7 +1,8 @@
-package trady.com.backend.entity.member;
+package trady.com.backend.account.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import trady.com.backend.entity.member.Member;
 
 import java.time.LocalDateTime;
 

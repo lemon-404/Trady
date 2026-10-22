@@ -120,4 +120,4 @@ API에서 공통으로 사용하는 Request 및 Response 객체를 정의한다.
 
 | 운영 도메인 | Version | Resource | Sub-resource | HTTP Method | Request | Response | URL |
 |---|---|---|---|---|---|---|---|
-|  |  |  |  |  |  |  |  |
+| 주식 | v1 | stock | candle | POST | CandleContinuousQueryRequest | CandleContinuousQueryResponse | /v1/stock/candle |

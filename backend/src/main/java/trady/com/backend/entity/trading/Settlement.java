@@ -2,9 +2,9 @@ package trady.com.backend.entity.trading;
 
 import jakarta.persistence.*;
 import lombok.*;
-import trady.com.backend.entity.member.Account;
+import trady.com.backend.account.entity.Account;
 import trady.com.backend.entity.trading.Enum.ExecutionStatus;
-import trady.com.backend.entity.trading.Enum.Side;
+import trady.com.backend.order.Enum.Side;
 
 import java.time.LocalDateTime;
 

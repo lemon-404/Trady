@@ -2,6 +2,7 @@ package trady.com.backend.entity.trading;
 
 import jakarta.persistence.*;
 import lombok.*;
+import trady.com.backend.order.entity.Order;
 import trady.com.backend.stock.entity.Stock;
 
 import java.time.LocalDateTime;

@@ -11,7 +11,7 @@ import trady.com.backend.global.kiwoom.candle.KiwoomStockCandleClient;
 import trady.com.backend.global.kiwoom.candle.dto.KiwoomStockCandleReqeust;
 import trady.com.backend.global.kiwoom.candle.dto.KiwoomStockCandleResponse;
 import trady.com.backend.global.resource.StockTarget;
-import trady.com.backend.stock.repository.StockRepository;
+import trady.com.backend.stock.repository.StockQueryRepository;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class StockCandleSyncService {
-    private final StockRepository stockRepository;
+    private final StockQueryRepository stockQueryRepository;
 
     private final KiwoomStockCandleClient candleClient;
     private final CandleService candleSaveService;
@@ -38,7 +38,7 @@ public class StockCandleSyncService {
             throw new RuntimeException(e);
         }
 
-        List<Stock> stocks = stockRepository.findAllByCodeIn(codes);
+        List<Stock> stocks = stockQueryRepository.findAllByCodeIn(codes);
         syncStockCandleList(stocks, intervals, Integer.MAX_VALUE);
     }
 

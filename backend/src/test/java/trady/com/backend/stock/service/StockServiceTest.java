@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import trady.com.backend.stock.entity.Stock;
-import trady.com.backend.stock.repository.StockRepository;
+import trady.com.backend.stock.repository.StockQueryRepository;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(StockService.class)
 class StockServiceTest {
     @Autowired StockService service;
-    @Autowired StockRepository repository;
+    @Autowired
+    StockQueryRepository repository;
     @Autowired EntityManager em;
 
     @Test

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Import;
 import trady.com.backend.candle.repository.CandleRepository;
 import trady.com.backend.stock.entity.Stock;
 import trady.com.backend.global.kiwoom.candle.dto.KiwoomStockCandleResponse.CandleItem;
-import trady.com.backend.stock.repository.StockRepository;
+import trady.com.backend.stock.repository.StockQueryRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,7 +20,8 @@ class CandleServiceTest {
     CandleService service;
     @Autowired
     CandleRepository repository;
-    @Autowired StockRepository stocks;
+    @Autowired
+    StockQueryRepository stocks;
     @Autowired EntityManager em;
     private static final LocalDateTime TIME = LocalDateTime.of(2026, 10, 9, 9, 0);
 

@@ -1,4 +1,4 @@
-package trady.com.backend.entity.trading.Enum;
+package trady.com.backend.order.Enum;
 
 /** order table Enum
  * LIMIT = 시장가,

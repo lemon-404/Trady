@@ -24,6 +24,9 @@ dependencies {
 	//webclient
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+	//Validated
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'

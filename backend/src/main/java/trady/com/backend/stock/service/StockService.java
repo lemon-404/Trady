@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import trady.com.backend.stock.entity.Stock;
-import trady.com.backend.stock.repository.StockRepository;
+import trady.com.backend.stock.repository.StockQueryRepository;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class StockService {
-    private final StockRepository stockRepository;
+    private final StockQueryRepository stockQueryRepository;
 
     @Transactional
     public void savePage(List<Stock> incomingStocks) {
@@ -20,7 +20,7 @@ public class StockService {
         List<String> codes = incomingStocks.stream()
                 .map(Stock::getCode)
                 .toList();
-        List<Stock> existingStocks = stockRepository.findAllByCodeIn(codes);
+        List<Stock> existingStocks = stockQueryRepository.findAllByCodeIn(codes);
 
         // 교집합: 기존 엔티티의 이름·시장만 변경한다. ID와 생성 시각은 유지한다.
         for (Stock existing : existingStocks) {
@@ -37,7 +37,7 @@ public class StockService {
                         .noneMatch(existing -> existing.getCode().equals(incoming.getCode())))
                 .toList();
         if (!newStocks.isEmpty()) {
-            stockRepository.saveAll(newStocks);
+            stockQueryRepository.saveAll(newStocks);
         }
     }
 }

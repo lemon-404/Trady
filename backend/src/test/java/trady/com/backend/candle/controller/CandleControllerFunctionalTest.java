@@ -18,7 +18,7 @@ import trady.com.backend.candle.repository.CandleQueryRepositoryV1;
 import trady.com.backend.candle.service.CandleQueryServiceV1;
 import trady.com.backend.candle.entity.Candle;
 import trady.com.backend.stock.entity.Stock;
-import trady.com.backend.stock.repository.StockRepository;
+import trady.com.backend.stock.repository.StockQueryRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,7 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({CandleController.class, CandleQueryServiceV1.class})
 class CandleControllerFunctionalTest {
     @Autowired CandleController controller;
-    @Autowired StockRepository stocks;
+    @Autowired
+    StockQueryRepository stocks;
     @Autowired
     CandleQueryRepositoryV1 candles;
     @Autowired EntityManager em;

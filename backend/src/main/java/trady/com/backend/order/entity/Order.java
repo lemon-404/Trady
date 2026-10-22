@@ -1,11 +1,12 @@
-package trady.com.backend.entity.trading;
+package trady.com.backend.order.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import trady.com.backend.entity.member.Account;
+import trady.com.backend.account.entity.Account;
+import trady.com.backend.order.Enum.OrderStatus;
+import trady.com.backend.order.Enum.OrderType;
+import trady.com.backend.order.Enum.Side;
 import trady.com.backend.stock.entity.Stock;
-import trady.com.backend.entity.trading.Enum.OrderType;
-import trady.com.backend.entity.trading.Enum.Side;
 
 import java.time.LocalDateTime;
 
@@ -28,9 +29,11 @@ public class Order {
     @JoinColumn(name = "stock_id", nullable = false)
     private Stock stock;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "side", nullable = false, length = 4)
     private Side side;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 6)
     private OrderType orderType;
 
@@ -40,8 +43,9 @@ public class Order {
     @Column(name = "quantity", nullable = false)
     private Long quantity;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private String status;
+    private OrderStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -56,8 +60,7 @@ public class Order {
             Side side,
             OrderType type,
             Long price,
-            Long quantity,
-            String status
+            Long quantity
     ) {
         this.account = account;
         this.stock = stock;
@@ -65,7 +68,7 @@ public class Order {
         this.orderType = type;
         this.price = price;
         this.quantity = quantity;
-        this.status = status;
+        this.status = OrderStatus.ACCEPTED;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = createdAt;
     }
