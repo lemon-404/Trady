@@ -7,7 +7,9 @@ import trady.com.backend.stock.Enum.StockMarket;
 import java.util.List;
 
 public record KiwoomStockListResponse(
-        @JsonProperty("list") List<StockInfo> stockInfoList
+        @JsonProperty("list") List<StockInfo> stockInfoList,
+        @JsonProperty("return_code") String returnCode,
+        @JsonProperty("return_msg") String returnMsg
 ) {
     public record StockInfo(
             String code,

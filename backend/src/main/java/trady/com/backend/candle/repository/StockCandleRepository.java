@@ -1,7 +1,7 @@
 package trady.com.backend.candle.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import trady.com.backend.entity.stock.Candle;
+import trady.com.backend.candle.entity.Candle;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

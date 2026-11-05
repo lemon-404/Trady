@@ -10,4 +10,5 @@ public interface StockQueryRepository extends JpaRepository<Stock, Long> {
     Optional<Stock> findByCode(String stockCode);
 
     List<Stock> findAllByCodeIn(List<String> codes);
+
 }
