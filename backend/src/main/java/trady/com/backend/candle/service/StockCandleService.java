@@ -3,10 +3,11 @@ package trady.com.backend.candle.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import trady.com.backend.candle.entity.Candle;
 import trady.com.backend.candle.repository.StockCandleRepository;
-import trady.com.backend.entity.stock.Candle;
-import trady.com.backend.entity.stock.Stock;
+
 import trady.com.backend.global.kiwoom.candle.dto.KiwoomStockCandleResponse;
+import trady.com.backend.stock.entity.Stock;
 
 import java.time.LocalDateTime;
 import java.util.List;

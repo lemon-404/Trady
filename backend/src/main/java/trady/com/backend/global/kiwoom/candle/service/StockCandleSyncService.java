@@ -1,20 +1,15 @@
 package trady.com.backend.global.kiwoom.candle.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 import trady.com.backend.candle.service.CandleService;
-import trady.com.backend.stock.entity.Stock;
 import trady.com.backend.global.kiwoom.candle.KiwoomStockCandleClient;
 import trady.com.backend.global.kiwoom.candle.dto.KiwoomStockCandleReqeust;
 import trady.com.backend.global.kiwoom.candle.dto.KiwoomStockCandleResponse;
-import trady.com.backend.global.resource.StockTarget;
+import trady.com.backend.stock.entity.Stock;
 import trady.com.backend.stock.repository.StockQueryRepository;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -29,16 +24,8 @@ public class StockCandleSyncService {
     private String baseDt = "20261009";
 
     public void syncStockCandleList() {
-        List<String> codes = null;
-        try {
-            codes = readStockTargets().stream()
-                    .map(StockTarget::stockCode)
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
-        List<Stock> stocks = stockQueryRepository.findAllByCodeIn(codes);
+        List<Stock> stocks = stockQueryRepository.findAll();
         syncStockCandleList(stocks, intervals, Integer.MAX_VALUE);
     }
 
@@ -85,16 +72,5 @@ public class StockCandleSyncService {
 
 
         }
-    }
-
-
-    private List<StockTarget> readStockTargets() throws IOException {
-        byte[] json = new ClassPathResource("stock-targets.json")
-                .getContentAsByteArray();
-
-        StockTarget[] targets =
-                new ObjectMapper().readValue(json, StockTarget[].class);
-
-        return Arrays.asList(targets);
     }
 }

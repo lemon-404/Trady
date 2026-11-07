@@ -1,0 +1,5 @@
+market:
+  open-time: "09:00"
+  close-time: "15:30"
+  # 거래소 휴장일을 yyyy-MM-dd 형식으로 쉼표로 구분해 입력합니다.
+  holidays: ""
