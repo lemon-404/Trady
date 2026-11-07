@@ -19,6 +19,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation('org.hibernate.orm:hibernate-core:7.4.15.Final')
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 
 	//webclient

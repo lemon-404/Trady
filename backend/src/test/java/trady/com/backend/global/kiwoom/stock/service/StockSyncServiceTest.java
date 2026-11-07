@@ -1,9 +1,5 @@
 package trady.com.backend.global.kiwoom.stock.service;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +8,6 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.ResponseEntity;
 import trady.com.backend.global.kiwoom.error.KiwoomApiException;
@@ -86,48 +81,31 @@ class StockSyncServiceTest  {
     }
 
     @Test
-    @DisplayName("키움_API_인증이_실패한다면")
+    @DisplayName("키움_API_인증이_실패하면_수집을_중단하고_예외를_전파한다")
     void ex1_stockInfoCollectTest() {
-        // given: 수집 서비스의 로그를 캡처
-        Logger logger = (Logger) LoggerFactory.getLogger(StockSyncService.class);
+        // given
+        KiwoomApiException exception = new KiwoomApiException(
+                "3",
+                "8005",
+                "인증에 실패했습니다[8005:Token이 유효하지 않습니다]",
+                null
+        );
 
-        ListAppender<ILoggingEvent> appender = new ListAppender<>();
-        appender.start();
-        logger.addAppender(appender);
+        when(stockClient.getStockList("N"))
+                .thenThrow(exception);
 
-        try {
-            KiwoomApiException exception = new KiwoomApiException(
-                    "3",
-                    "8005",
-                    "인증에 실패했습니다[8005:Token이 유효하지 않습니다]",
-                    null
-            );
+        // when & then: 발생한 예외를 그대로 전달한다.
+        assertThatThrownBy(() -> stockSyncService.syncStockInfoList())
+                .isSameAs(exception);
 
-            when(stockClient.getStockList("N"))
-                    .thenThrow(exception);
+        // 첫 요청이 실패하면 추가 조회를 하지 않는다.
+        verify(stockClient).getStockList("N");
+        verifyNoMoreInteractions(stockClient);
 
-            // when & then: 예외를 삼키지 않고 수집 중단
-            assertThatThrownBy(() -> stockSyncService.syncStockInfoList())
-                    .isSameAs(exception);
-
-            // 추가 API 호출 및 저장 요청 없음
-            verify(stockClient).getStockList("N");
-            verifyNoMoreInteractions(stockClient);
-            verifyNoInteractions(stockService);
-
-            // 인증 실패 내역 기록
-            assertThat(appender.list).anySatisfy(event -> {
-                assertThat(event.getLevel()).isEqualTo(Level.ERROR);
-                assertThat(event.getFormattedMessage())
-                        .contains("종목 수집 인증 실패")
-                        .contains("8005");
-            });
-        } finally {
-            // 다른 테스트에 영향을 주지 않도록 로그 캡처 해제
-            logger.detachAppender(appender);
-            appender.stop();
-        }
+        // 수집에 실패했으므로 저장을 시도하지 않는다.
+        verifyNoInteractions(stockService);
     }
+
 
     @Test
     void 종목명이_누락된_종목은_제외하고_정상_종목만_저장한다() {

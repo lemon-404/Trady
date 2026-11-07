@@ -70,8 +70,8 @@ class KiwoomStockClientTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getFirst("cont-yn")).isEqualTo("N");
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().returnCode()).isEqualTo("0");
-        assertThat(response.getBody().stockInfoList()).singleElement().satisfies(stock -> {
+        assertThat(response.getBody().getReturnCode()).isEqualTo("0");
+        assertThat(response.getBody().getStockInfoList()).singleElement().satisfies(stock -> {
             assertThat(stock.code()).isEqualTo("005930");
             assertThat(stock.name()).isEqualTo("삼성전자");
             assertThat(stock.marketCode()).isEqualTo("0");

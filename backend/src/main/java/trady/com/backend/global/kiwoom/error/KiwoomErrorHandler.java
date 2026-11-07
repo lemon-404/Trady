@@ -5,13 +5,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import tools.jackson.databind.ObjectMapper;
 
+/**
+ * 키움 API 호출 실패 정보를 보관하는 예외.
+ *
+ * <p>returnCode는 응답의 return_code 값으로, "0"은 성공이고 그 외는 실패다.
+ * errorCode는 return_msg의 "[숫자:" 패턴에서 추출한 상세 오류코드이며,
+ * 해당 패턴이 없으면 null이다.
+ */
 @Component
 @RequiredArgsConstructor
 public class KiwoomErrorHandler {
 
     private final ObjectMapper objectMapper;
 
-    // HTTP 4xx·5xx 오류 변환
     public KiwoomApiException convert(WebClientResponseException cause) {
         KiwoomErrorResponse body;
 

@@ -7,7 +7,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
-import trady.com.backend.global.kiwoom.error.KiwoomApiException;
 import trady.com.backend.global.kiwoom.stock.client.KiwoomStockClient;
 import trady.com.backend.global.kiwoom.stock.dto.KiwoomStockListResponse;
 import trady.com.backend.global.resource.StockTarget;
@@ -39,25 +38,9 @@ public class StockSyncService {
         Set<String> targetCodes = getTargetCodes();
 
         while (true) {
+            ResponseEntity<KiwoomStockListResponse> response = stockClient.getStockList(nextKey);
 
-            ResponseEntity<KiwoomStockListResponse> response = null;
-            try {
-                response = stockClient.getStockList(nextKey);
-            } catch (KiwoomApiException e) {
-                if ("8005".equals(e.getErrorCode())) {
-                    log.error("종목 수집 인증 실패: {}", e.getMessage(), e);
-                } else {
-                    log.error("종목 수집 실패: 반환코드={}, 오류코드={}, 메시지={}",
-                            e.getReturnCode(),
-                            e.getErrorCode(),
-                            e.getMessage(),
-                            e);
-                }
-
-                throw e;
-            }
-
-            stocks.addAll(response.getBody().stockInfoList().stream()
+            stocks.addAll(response.getBody().getStockInfoList().stream()
                     .filter(stock -> {
                         if (!hasRequiredData(stock)) {
                             log.error("종목 필수 데이터 누락: {}", stock);

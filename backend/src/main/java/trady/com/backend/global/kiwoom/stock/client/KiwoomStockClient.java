@@ -5,8 +5,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import trady.com.backend.global.kiwoom.auth.KiwoomTokenProvider;
+import trady.com.backend.global.kiwoom.error.HandleKiwoomError;
 import trady.com.backend.global.kiwoom.error.KiwoomApiException;
 import trady.com.backend.global.kiwoom.error.KiwoomErrorHandler;
 import trady.com.backend.global.kiwoom.stock.dto.KiwoomStockInfoResponse;
@@ -14,6 +16,7 @@ import trady.com.backend.global.kiwoom.stock.dto.KiwoomStockListResponse;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 @Component
 public class KiwoomStockClient {
@@ -56,25 +59,38 @@ public class KiwoomStockClient {
         return response;
     }
 
+    @HandleKiwoomError
     public ResponseEntity<KiwoomStockListResponse> getStockList(String nextKey) {
         validateAccessToken();
 
         ResponseEntity<KiwoomStockListResponse> response;
-        try {
-            response = webClient.post()
-                    .uri("/api/dostk/stkinfo")
-                    .headers(headers -> headers.setBearerAuth(provider.getToken()))
-                    .header("api-id", "ka10099")
-                    .header("cont-yn", nextKey.equals("N") ? "N" : "Y")
-                    .header("next-key", nextKey.equals("N") ? "" : nextKey)
-                    .contentType(MediaType.parseMediaType("application/json;charset=UTF-8"))
-                    .bodyValue(Map.of("mrkt_tp", "0"))
-                    .retrieve()
-                    .toEntity(KiwoomStockListResponse.class)
-                    .block(Duration.ofSeconds(2));
-        } catch (WebClientResponseException e) {
-            throw errorHandler.convert(e);
-        }
+
+        response = webClient.post()
+                .uri("/api/dostk/stkinfo")
+                .headers(headers -> headers.setBearerAuth(provider.getToken()))
+                .header("api-id", "ka10099")
+                .header("cont-yn", nextKey.equals("N") ? "N" : "Y")
+                .header("next-key", nextKey.equals("N") ? "" : nextKey)
+                .contentType(MediaType.parseMediaType("application/json;charset=UTF-8"))
+                .bodyValue(Map.of("mrkt_tp", "0"))
+                .retrieve()
+                .toEntity(KiwoomStockListResponse.class)
+                .timeout(Duration.ofSeconds(1))
+                .onErrorMap(WebClientResponseException.class,errorHandler::convert)
+                .onErrorMap(
+                        TimeoutException.class,
+                        e -> new KiwoomApiException(
+                                null, null, "키움 API 응답 시간이 초과되었습니다.", e
+                        )
+                )
+                .onErrorMap(
+                        WebClientRequestException.class,
+                        e -> new KiwoomApiException(
+                                null, null, "키움 API 연결에 실패했습니다.", e
+                        )
+                )
+                .block();
+
 
         if (response == null || response.getBody() == null) {
             throw new KiwoomApiException(
@@ -82,7 +98,7 @@ public class KiwoomStockClient {
             );
         }
         KiwoomStockListResponse body = response.getBody();
-        errorHandler.validate(body.returnCode(), body.returnMsg());
+        errorHandler.validate(body.getReturnCode(), body.getReturnMsg());
 
         return response;
     }
