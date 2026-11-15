@@ -8,7 +8,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import trady.com.backend.global.response.ApiErrorResponse;
 import trady.com.backend.global.response.FieldErrorDetail;
 import trady.com.backend.global.response.TradyErrorResponse;
 
@@ -19,11 +18,11 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleResourceNotFound(
+    public ResponseEntity<TradyErrorResponse> handleResourceNotFound(
             ResourceNotFoundException exception
     ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-                "404",
+        TradyErrorResponse response = new TradyErrorResponse(
+                3000,
                 "요청한 리소스를 찾을 수 없습니다.",
                 List.of()
         );
@@ -34,20 +33,20 @@ public class GlobalExceptionHandler {
 
     //@Valid
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponse> handleValidationFailure(
+    public ResponseEntity<TradyErrorResponse> handleValidationFailure(
             MethodArgumentNotValidException exception
     ) {
-        List<ApiErrorResponse.FieldErrorDetail> errors = exception.getBindingResult()
+        List<FieldErrorDetail> errors = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(error -> new ApiErrorResponse.FieldErrorDetail(
+                .map(error -> new FieldErrorDetail(
                         error.getField(),
                         error.getDefaultMessage()
                 ))
                 .toList();
 
-        ApiErrorResponse response = new ApiErrorResponse(
-                "400",
+        TradyErrorResponse response = new TradyErrorResponse(
+                1000,
                 "요청값을 확인해 주세요.",
                 errors
         );
@@ -56,11 +55,11 @@ public class GlobalExceptionHandler {
     }
     //@RequestBody
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiErrorResponse> handleUnreadableRequestBody(
+    public ResponseEntity<TradyErrorResponse> handleUnreadableRequestBody(
             HttpMessageNotReadableException exception
     ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-                "400",
+        TradyErrorResponse response = new TradyErrorResponse(
+                1000,
                 "요청값을 확인해 주세요.",
                 List.of()
         );

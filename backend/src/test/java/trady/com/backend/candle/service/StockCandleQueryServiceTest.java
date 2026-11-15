@@ -5,21 +5,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import trady.com.backend.candle.repository.CandleRepository;
+import trady.com.backend.candle.repository.StockCandleRepository;
+import trady.com.backend.global.kiwoom.candle.dto.CandleResponse.CandleItem;
 import trady.com.backend.stock.entity.Stock;
-import trady.com.backend.global.kiwoom.candle.dto.KiwoomStockCandleResponse.CandleItem;
 import trady.com.backend.stock.repository.StockQueryRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest(properties = "spring.jpa.properties.hibernate.globally_quoted_identifiers=true")
-@Import(CandleService.class)
-class CandleServiceTest {
-    @Autowired
-    CandleService service;
-    @Autowired
-    CandleRepository repository;
+@Import(StockCandleService.class)
+class StockCandleQueryServiceTest {
+    @Autowired StockCandleService service;
+    @Autowired StockCandleRepository repository;
     @Autowired
     StockQueryRepository stocks;
     @Autowired EntityManager em;

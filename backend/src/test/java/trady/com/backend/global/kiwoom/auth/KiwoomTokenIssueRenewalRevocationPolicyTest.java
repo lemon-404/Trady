@@ -15,7 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import trady.com.backend.global.kiwoom.auth.dto.issue.KiwoomTokenIssueResponse;
 import trady.com.backend.global.kiwoom.config.KiwoomProperties;
 import trady.com.backend.global.kiwoom.config.KiwoomWebClientConfig;
-import trady.com.backend.global.kiwoom.stock.client.KiwoomStockClient;
+import trady.com.backend.global.kiwoom.stock.client.StockClient;
 import trady.com.backend.global.kiwoom.stock.dto.KiwoomStockInfoResponse;
 
 import java.time.LocalDateTime;
@@ -58,7 +58,7 @@ class KiwoomTokenIssueRenewalRevocationPolicyTest {
     private KiwoomAuthClient authClient;
 
     @Autowired
-    private KiwoomStockClient stockClient;
+    private StockClient stockClient;
 
     @Autowired
     private KiwoomTokenProvider tokenProvider;
@@ -167,7 +167,7 @@ class KiwoomTokenIssueRenewalRevocationPolicyTest {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @Import({KiwoomWebClientConfig.class, KiwoomAuthClient.class, KiwoomStockClient.class})
+    @Import({KiwoomWebClientConfig.class, KiwoomAuthClient.class, StockClient.class})
     static class TestConfig {
         // Lifecycle과 DB는 등록하지 않고, Provider는 검증할 토큰만 반환한다.
         @Bean

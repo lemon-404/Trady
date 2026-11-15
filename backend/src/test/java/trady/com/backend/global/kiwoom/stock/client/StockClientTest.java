@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class KiwoomStockClientTest {
+class StockClientTest {
     private static final String AUTH_ERROR = """
             {
                 "return_msg": "인증에 실패했습니다[8005:Token이 유효하지 않습니다]",
@@ -38,7 +38,7 @@ class KiwoomStockClientTest {
     private ExchangeFunction exchangeFunction;
     @Mock
     private KiwoomTokenProvider provider;
-    private KiwoomStockClient client;
+    private StockClient client;
 
     @BeforeEach
     void setUp() {
@@ -47,7 +47,7 @@ class KiwoomStockClientTest {
                 .baseUrl("https://kiwoom.test")
                 .exchangeFunction(exchangeFunction)
                 .build();
-        client = new KiwoomStockClient(webClient, provider,
+        client = new StockClient(webClient, provider,
                 new KiwoomErrorHandler(new ObjectMapper()));
         when(provider.getToken()).thenReturn("test-token");
     }

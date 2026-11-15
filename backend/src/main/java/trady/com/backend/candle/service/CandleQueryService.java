@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import trady.com.backend.candle.entity.Candle;
 import trady.com.backend.candle.repository.CandleRepository;
-import trady.com.backend.global.kiwoom.candle.dto.KiwoomStockCandleResponse;
+import trady.com.backend.global.kiwoom.candle.dto.CandleResponse;
 import trady.com.backend.stock.entity.Stock;
 
 import java.time.LocalDateTime;
@@ -13,16 +13,16 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CandleService {
+public class CandleQueryService {
     private final CandleRepository candleRepository;
 
     @Transactional
     public void savePage(Stock stock, String interval,
-                         List<KiwoomStockCandleResponse.CandleItem> items) {
+                         List<CandleResponse.CandleItem> items) {
 
         List<Candle> incomingCandles = items.stream()
                 .distinct()
-                .map(item -> KiwoomStockCandleResponse.toResponseDto(item, stock, interval))
+                .map(item -> CandleResponse.toResponseDto(item, stock, interval))
                 .toList();
 
         if (incomingCandles.isEmpty()) return;

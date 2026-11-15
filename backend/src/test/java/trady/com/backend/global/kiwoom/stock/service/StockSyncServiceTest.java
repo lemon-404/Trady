@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.ResponseEntity;
 import trady.com.backend.global.kiwoom.error.KiwoomApiException;
-import trady.com.backend.global.kiwoom.stock.client.KiwoomStockClient;
+import trady.com.backend.global.kiwoom.stock.client.StockClient;
 import trady.com.backend.global.kiwoom.stock.dto.KiwoomStockListResponse;
 import trady.com.backend.stock.entity.Stock;
 import trady.com.backend.stock.service.StockService;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 class StockSyncServiceTest  {
 
     @Mock
-    private KiwoomStockClient stockClient;
+    private StockClient stockClient;
 
     @Mock
     private StockService stockService;

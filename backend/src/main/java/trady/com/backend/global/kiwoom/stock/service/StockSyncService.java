@@ -7,7 +7,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
-import trady.com.backend.global.kiwoom.stock.client.KiwoomStockClient;
+import trady.com.backend.global.kiwoom.stock.client.StockClient;
 import trady.com.backend.global.kiwoom.stock.dto.KiwoomStockListResponse;
 import trady.com.backend.global.resource.StockTarget;
 import trady.com.backend.stock.entity.Stock;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class StockSyncService {
-    private final KiwoomStockClient stockClient;
+    private final StockClient stockClient;
     private final StockService stockService;
 
     public void syncStockInfoList() {

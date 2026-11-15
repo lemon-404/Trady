@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import trady.com.backend.candle.entity.Candle;
 import trady.com.backend.candle.repository.StockCandleRepository;
 
-import trady.com.backend.global.kiwoom.candle.dto.KiwoomStockCandleResponse;
+import trady.com.backend.global.kiwoom.candle.dto.CandleResponse;
 import trady.com.backend.stock.entity.Stock;
 
 import java.time.LocalDateTime;
@@ -19,11 +19,11 @@ public class StockCandleService {
 
     @Transactional
     public void savePage(Stock stock, String interval,
-                         List<KiwoomStockCandleResponse.CandleItem> items) {
+                         List<CandleResponse.CandleItem> items) {
 
         List<Candle> incomingCandles = items.stream()
                 .distinct()
-                .map(item -> KiwoomStockCandleResponse.toResponseDto(item, stock, interval))
+                .map(item -> CandleResponse.toResponseDto(item, stock, interval))
                 .toList();
 
         if (incomingCandles.isEmpty()) return;

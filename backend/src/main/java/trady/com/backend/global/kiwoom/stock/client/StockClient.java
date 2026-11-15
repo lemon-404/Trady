@@ -19,14 +19,14 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 @Component
-public class KiwoomStockClient {
+public class StockClient {
 
     private final WebClient webClient;
     private final KiwoomTokenProvider provider;
 
     private final KiwoomErrorHandler errorHandler;
 
-    public KiwoomStockClient(@Qualifier("kiwoomWebClient") WebClient webClient, KiwoomTokenProvider provider, KiwoomErrorHandler errorHandler) {
+    public StockClient(@Qualifier("kiwoomWebClient") WebClient webClient, KiwoomTokenProvider provider, KiwoomErrorHandler errorHandler) {
         this.webClient = webClient;
         this.provider = provider;
         this.errorHandler = errorHandler;
