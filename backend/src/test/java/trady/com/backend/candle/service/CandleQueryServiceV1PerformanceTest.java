@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 import trady.com.backend.candle.dto.CandleContinuousQueryRequest;
 import trady.com.backend.candle.repository.CandleQueryRepository;
+import trady.com.backend.candle.config.CandleQueryProperties;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -66,6 +67,7 @@ class CandleQueryServiceV1PerformanceTest {
 
     @Autowired
     CandleQueryService service;
+    @Autowired CandleQueryProperties properties;
     @Autowired DataSource dataSource;
 
     @BeforeEach
@@ -79,7 +81,7 @@ class CandleQueryServiceV1PerformanceTest {
     @ValueSource(strings = {"1", "5", "15"})
     @DisplayName("PostgreSQL 최초 단일 조회 시간을 반복 측정한다")
     void measureInitialRequest(String interval) throws IOException {
-        var request = new CandleContinuousQueryRequest(STOCK_CODE, interval, UPPER);
+        var request = new CandleContinuousQueryRequest(STOCK_CODE, interval + "m", null);
         for (int i = 0; i < WARMUP_COUNT; i++) {
             assertThat(service.getCandles(request).candles()).as("측정 대상 데이터 필요").isNotEmpty();
         }
@@ -98,7 +100,7 @@ class CandleQueryServiceV1PerformanceTest {
         }
         printSummary(interval + "분봉 최초 조회", times);
         var result = commonResult(interval);
-        result.put("cursor", UPPER);
+        result.put("cursor", null);
         result.put("measurementCount", times.size());
         result.put("requests", measurements);
         result.put("statistics", statistics(times));
@@ -124,13 +126,8 @@ class CandleQueryServiceV1PerformanceTest {
     private Map<String, Object> commonResult(String interval) {
         var result = new LinkedHashMap<String, Object>();
         result.put("stockCode", STOCK_CODE);
-        result.put("interval", interval);
-        result.put("pageSize", switch (interval) {
-            case "1" -> 390;
-            case "5" -> 78;
-            case "15" -> 26;
-            default -> throw new IllegalArgumentException("지원하지 않는 봉 주기");
-        });
+        result.put("interval", interval + "m");
+        result.put("pageSize", properties.pageSize());
         result.put("warmupCount", WARMUP_COUNT);
         return result;
     }

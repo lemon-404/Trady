@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import trady.com.backend.candle.service.CandleQueryService;
+import trady.com.backend.candle.domain.CandleInterval;
+import trady.com.backend.global.kiwoom.candle.KiwoomCandleMapping;
 import trady.com.backend.global.kiwoom.candle.historical.CandleClient;
 import trady.com.backend.global.kiwoom.candle.historical.dto.CandleRequest;
 import trady.com.backend.global.kiwoom.candle.historical.dto.CandleResponse;
@@ -42,7 +44,7 @@ public class CandleSyncService {
                     .build();
 
     private RetryPolicy<ResponseEntity<CandleResponse>> createRetryPolicy(
-            Stock stock, String interval, int page
+            Stock stock, CandleInterval interval, int page
     ) {
         return RetryPolicy.<ResponseEntity<CandleResponse>>builder()
                     .handleIf(this::isRetryable)
@@ -67,9 +69,6 @@ public class CandleSyncService {
                     && response.getStatusCode().is5xxServerError());
     }
 
-    private String[] minuteIntervals = {"1", "5", "15", "30", "60"};
-    private String[] intervals = {"1d", "1w", "1M", "1y"};
-
     private String baseDt = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
 
     public void syncStockCandleList() {
@@ -81,49 +80,28 @@ public class CandleSyncService {
     // 지정한 종목들의 모든 봉 주기를 수집한다.
     void syncCandlesForStocks(List<Stock> stocks) {
 
-        //1. 종목 50개
-        for (int i = 0; i < stocks.size(); i++) {
-            Stock stock = stocks.get(i);
-
-            syncMinuteCandles("ka10080", minuteIntervals, stock); //분
-            syncCandlesForInterval("ka10081", intervals[0], stock); //일
-            syncCandlesForInterval("ka10082", intervals[1], stock); //주
-            syncCandlesForInterval("ka10083", intervals[2], stock); //월
-            syncCandlesForInterval("ka10094", intervals[3], stock); //년
-        }
-    }
-
-    // 멀티 봉 주기 수집 (분봉)
-    private void syncMinuteCandles(
-            String tr,
-            String[] intervals,
-            Stock stock
-    ) {
-        for (String interval : intervals) {
-            syncCandlesForInterval(tr, interval, stock);
+        for (Stock stock : stocks) {
+            for (CandleInterval interval : CandleInterval.values()) {
+                syncCandlesForInterval(interval, stock);
+            }
         }
     }
 
     // 단일 봉 주기의 요청을 생성하고 수집한다.
     private void syncCandlesForInterval(
-            String tr,
-            String interval,
+            CandleInterval interval,
             Stock stock
     ) {
-        CandleRequest request = new CandleRequest(
-                stock.getCode(),
-                baseDt,
-                interval
-        );
-        fetchCandlePages(tr, interval, stock, request);
+        CandleRequest request = KiwoomCandleMapping.request(stock.getCode(), baseDt, interval);
+        fetchCandlePages(interval, stock, request);
     }
 
     private void fetchCandlePages(
-            String tr,
-            String interval,
+            CandleInterval interval,
             Stock stock,
             CandleRequest request
     ) {
+        String tr = KiwoomCandleMapping.tr(interval);
         String nextKey = "N";
         String contYn;
         int page = 1;

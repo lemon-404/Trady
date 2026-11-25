@@ -3,6 +3,7 @@ package trady.com.backend.candle.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import trady.com.backend.stock.entity.Stock;
+import trady.com.backend.candle.domain.CandleInterval;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +32,8 @@ public class Candle {
     private Stock stock;
 
     @Column(name = "interval", nullable = false, length = 10)
-    private String interval;
+    @Convert(converter = CandleIntervalConverter.class)
+    private CandleInterval interval;
 
     @Column(name = "candle_time", nullable = false)
     private LocalDateTime time;
@@ -52,9 +54,9 @@ public class Candle {
     private Long volume;
 
     @Builder
-    public Candle(Stock stock, String interval, LocalDateTime time, int openPrice, int highPrice, int lowPrice, int closePrice, Long volume) {
+    public Candle(Stock stock, CandleInterval interval, LocalDateTime time, int openPrice, int highPrice, int lowPrice, int closePrice, Long volume) {
         this.stock = stock;
-        this.interval = interval;
+        this.interval = java.util.Objects.requireNonNull(interval, "봉 단위가 필요합니다.");
         this.time = time;
         this.openPrice = openPrice;
         this.highPrice = highPrice;

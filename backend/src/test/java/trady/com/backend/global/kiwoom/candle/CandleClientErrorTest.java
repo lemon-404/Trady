@@ -69,6 +69,6 @@ class CandleClientErrorTest {
 
     private org.springframework.http.ResponseEntity<CandleResponse> request(CandleClient client) {
         return client.request(new CandleRequest("005930", "20261112", "1"),
-                "N", "ka10080", CandleResponse.class);
+                "N", "ka11080", CandleResponse.class);
     }
 }

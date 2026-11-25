@@ -20,12 +20,12 @@ import static org.mockito.Mockito.when;
 class CandleClientTest {
     @Test
     void sendsFirstPageRequestWithTokenAndChartTr() {
-        request("N", "ka10080", "1", "N", "");
+        request("N", "ka11080", "1", "N", "");
     }
 
     @Test
     void sendsContinuationCursorUsingTheSameChartEndpoint() {
-        request("page-2", "ka10082", "1w", "Y", "page-2");
+        request("page-2", "ka11082", "1w", "Y", "page-2");
     }
 
     private void request(String nextKey, String tr, String interval, String expectedContinuation, String expectedKey) {

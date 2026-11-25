@@ -3,7 +3,7 @@ package trady.com.backend.global.kiwoom.candle.realtime;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
-import trady.com.backend.global.kiwoom.candle.historical.dto.CandleRequest;
+import trady.com.backend.global.kiwoom.candle.KiwoomCandleMapping;
 
 import java.time.Clock;
 import java.time.LocalDate;
@@ -49,7 +49,7 @@ public class RealtimeCandleCollector {
     private void request(RealtimeCandleDispatcher.Task task, String baseDate) {
         // 클라이언트 메서드 자체에서 예외가 발생해도 Reactor 오류 경로로 처리한다.
         Mono.defer(() -> client.request(
-                        new CandleRequest(task.stock().getCode(), baseDate, task.scope().interval()),
+                        KiwoomCandleMapping.request(task.stock().getCode(), baseDate, task.scope().interval()),
                         task.scope().tr(),
                         "N"))
                 .flatMap(response -> Mono.fromCallable(() -> store.save(task, response.getBody().getList(),

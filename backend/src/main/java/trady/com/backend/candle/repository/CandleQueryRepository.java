@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import trady.com.backend.candle.entity.Candle;
+import trady.com.backend.candle.domain.CandleInterval;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +24,7 @@ public interface CandleQueryRepository extends JpaRepository<Candle, Long> {
             """)
     List<Candle> findInitialCandles(
             @Param("stockCode") String stockCode,
-            @Param("interval") String interval,
+            @Param("interval") CandleInterval interval,
             Pageable pageable
     );
 
@@ -37,7 +38,7 @@ public interface CandleQueryRepository extends JpaRepository<Candle, Long> {
             """)
     List<Candle> findContinuousCandles(
             @Param("stockCode") String stockCode,
-            @Param("interval") String interval,
+            @Param("interval") CandleInterval interval,
             @Param("cursor") LocalDateTime cursor,
             Pageable pageable
     );
