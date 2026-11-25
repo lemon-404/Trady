@@ -27,11 +27,12 @@ public class KiwoomTokenLifecycle implements ApplicationRunner {
     public void shutdown() {
         try {
             tokenProvider.revokeToken();
+            log.info("키움 토큰 폐기 완료");
         } catch (RuntimeException exception) {
             // 외부 응답이 포함될 수 있는 예외 메시지와 토큰은 출력하지 않는다.
             log.warn("키움 토큰 폐기 실패. 원격 토큰이 유효할 수 있습니다. 오류 유형: {}",
                     exception.getClass().getSimpleName());
         }
-        log.info("키움 토큰 폐기 완료");
+
     }
 }

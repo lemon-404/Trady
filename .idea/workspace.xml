@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="8286f563-43d7-424c-b7cd-c227f48afb2b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/backend/docs/performance/candle-query/2. 기간 연속 조회/RepoV1-ServiceV1-20261014-090645.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/candle/controller/CandleController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/candle/controller/CandleController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/candle/repository/CandleQueryRepositoryV1.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/candle/repository/CandleQueryRepositoryV1.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/candle/service/CandleQueryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/candle/service/CandleQueryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/candle/service/CandleQueryServiceV1.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/candle/service/CandleQueryServiceV1.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/candle/service/StockCandleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/candle/service/StockCandleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/global/kiwoom/candle/CandleClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/global/kiwoom/candle/historical/CandleClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/global/kiwoom/candle/dto/CandleRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/global/kiwoom/candle/historical/dto/CandleRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/global/kiwoom/candle/dto/CandleResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/global/kiwoom/candle/historical/dto/CandleResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/global/kiwoom/candle/service/CandleSyncService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/global/kiwoom/candle/historical/service/CandleSyncService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/global/sync/MarketDataSyncRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/trady/com/backend/global/sync/MarketDataSyncRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/candle/controller/CandleControllerFunctionalTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/candle/controller/CandleControllerFunctionalTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/candle/service/CandleQueryServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/candle/service/CandleQueryServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/candle/service/CandleQueryServiceV1PerformanceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/candle/service/CandleQueryServiceV1PerformanceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/candle/service/StockCandleQueryServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/candle/service/StockCandleQueryServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/global/kiwoom/candle/CandleClientErrorTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/global/kiwoom/candle/CandleClientErrorTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/global/kiwoom/candle/service/CandleSyncErrorTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/global/kiwoom/candle/service/CandleSyncErrorTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/global/kiwoom/candle/service/CandleSyncServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/global/kiwoom/candle/service/CandleSyncServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/global/kiwoom/stock/client/CandleClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/trady/com/backend/global/kiwoom/stock/client/CandleClientTest.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "lemon-404"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/lemon-404/Trady.git",
+    "accountId": "1bf9e0be-dae1-4792-9639-3395363652d1"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 1,
+  "fromUser": false
+}]]></component>
+  <component name="ProjectId" id="3ME4ex5rLsMiDLfwPNZikat8vVL" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+    <option name="showModules" value="false" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "14-차트-관리/28-차트-데이터-수집",
+    "last_opened_file_path": "C:/DeveloperWork/Trady",
+    "nodejs_package_manager_path": "npm"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-a203e0a19954-intellij.indexing.shared.core-IU-262.10968.63" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.10968.63" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8286f563-43d7-424c-b7cd-c227f48afb2b" name="Changes" comment="" />
+      <created>1794902491523</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1794902491523</updated>
+    </task>
+    <servers />
+  </component>
+</project>

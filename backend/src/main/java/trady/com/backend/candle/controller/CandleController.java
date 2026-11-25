@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import trady.com.backend.candle.dto.CandleContinuousQueryRequest;
 import trady.com.backend.candle.dto.CandleContinuousQueryResponse;
-import trady.com.backend.candle.service.CandleQueryServiceV1;
+import trady.com.backend.candle.service.CandleQueryService;
 
 
 @RestController
@@ -16,13 +16,13 @@ import trady.com.backend.candle.service.CandleQueryServiceV1;
 @RequiredArgsConstructor
 public class CandleController {
 
-    private final CandleQueryServiceV1 service;
+    private final CandleQueryService service;
 
     @PostMapping(headers = "cont-yn=N")
     public ResponseEntity<CandleContinuousQueryResponse> getInitialCandles(
             @RequestBody CandleContinuousQueryRequest request
     ) {
-        CandleContinuousQueryResponse response = service.getInitialCandles(request);
+        CandleContinuousQueryResponse response = service.getCandles(request);
         return ResponseEntity.ok(response);
     }
 

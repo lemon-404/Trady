@@ -7,7 +7,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import trady.com.backend.global.kiwoom.candle.service.StockCandleSyncService;
+import trady.com.backend.global.kiwoom.candle.historical.service.CandleSyncService;
 import trady.com.backend.global.kiwoom.stock.service.StockSyncService;
 
 @Slf4j
@@ -21,7 +21,7 @@ import trady.com.backend.global.kiwoom.stock.service.StockSyncService;
 public class MarketDataSyncRunner implements ApplicationRunner {
 
     private final StockSyncService stockSyncService;
-    private final StockCandleSyncService stockCandleSyncService;
+    private final CandleSyncService candleSyncService;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -29,7 +29,7 @@ public class MarketDataSyncRunner implements ApplicationRunner {
 
         long start = System.nanoTime();
 
-        stockCandleSyncService.syncStockCandleList();
+        candleSyncService.syncStockCandleList();
         double elapsedSeconds =
                 (System.nanoTime() - start) / 1_000_000_000.0;
 

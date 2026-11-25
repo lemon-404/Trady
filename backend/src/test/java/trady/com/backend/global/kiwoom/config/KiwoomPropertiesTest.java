@@ -7,12 +7,18 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringJUnitConfig(
         classes = KiwoomPropertiesTest.TestConfig.class,
         initializers = ConfigDataApplicationContextInitializer.class
 )
+@TestPropertySource(properties = {
+        "kiwoom.base-url=https://mockapi.kiwoom.com",
+        "kiwoom.app-key=test-app-key",
+        "kiwoom.secret-key=test-secret-key"
+})
 class KiwoomPropertiesTest {
 
     @Autowired
