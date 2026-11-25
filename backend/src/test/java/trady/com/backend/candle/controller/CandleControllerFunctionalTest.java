@@ -14,8 +14,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 import trady.com.backend.candle.dto.CandleContinuousQueryRequest;
 import trady.com.backend.candle.dto.CandleContinuousQueryResponse;
-import trady.com.backend.candle.repository.CandleQueryRepositoryV1;
-import trady.com.backend.candle.service.CandleQueryServiceV1;
+import trady.com.backend.candle.repository.CandleQueryRepository;
+import trady.com.backend.candle.service.CandleQueryService;
 import trady.com.backend.candle.entity.Candle;
 import trady.com.backend.stock.entity.Stock;
 import trady.com.backend.stock.repository.StockQueryRepository;
@@ -34,13 +34,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @DataJpaTest(properties = {"spring.jpa.properties.hibernate.globally_quoted_identifiers=true",
         "spring.jpa.hibernate.ddl-auto=create-drop"})
-@Import({CandleController.class, CandleQueryServiceV1.class})
+@Import({CandleController.class, CandleQueryService.class})
 class CandleControllerFunctionalTest {
     @Autowired CandleController controller;
     @Autowired
     StockQueryRepository stocks;
     @Autowired
-    CandleQueryRepositoryV1 candles;
+    CandleQueryRepository candles;
     @Autowired EntityManager em;
 
     private MockMvc mvc;
@@ -50,6 +50,20 @@ class CandleControllerFunctionalTest {
     @BeforeEach
     void setup() {
         mvc = MockMvcBuilders.standaloneSetup(controller).build();
+    }
+
+    @ParameterizedTest
+    @CsvSource({"1,390", "5,78", "15,26"})
+    @DisplayName("커서가 없는 최초 조회는 최신 캔들부터 조회한다")
+    void returnsLatestPageWithoutCursor(String interval, int limit) throws Exception {
+        seed(interval, limit + 1);
+        var response = request("N", interval, null);
+        assertThat(response.candles()).hasSize(limit);
+        assertThat(response.contYn()).isEqualTo("Y");
+        assertThat(response.nextCursor()).isEqualTo(START.plusMinutes(Integer.parseInt(interval)));
+        assertThat(response.candles().get(limit - 1).time())
+                .isEqualTo(START.plusMinutes((long) limit * Integer.parseInt(interval)));
+        assertAscending(response);
     }
 
     @ParameterizedTest
@@ -106,7 +120,7 @@ class CandleControllerFunctionalTest {
     private CandleContinuousQueryResponse request(String contYn, String interval,
                                                   LocalDateTime cursor) throws Exception {
         String body = mapper.writeValueAsString(new CandleContinuousQueryRequest("005930", interval, cursor));
-        var result = mvc.perform(post("/").header("cont-yn", contYn)
+        var result = mvc.perform(post("/v1/stock/candle").header("cont-yn", contYn)
                 .contentType(MediaType.APPLICATION_JSON).content(body)).andReturn();
         status().isOk().match(result);
         return mapper.readValue(result.getResponse().getContentAsString(), CandleContinuousQueryResponse.class);

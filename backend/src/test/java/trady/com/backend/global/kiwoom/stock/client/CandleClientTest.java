@@ -1,144 +1,51 @@
 package trady.com.backend.global.kiwoom.stock.client;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import trady.com.backend.global.kiwoom.candle.CandleClient;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import tools.jackson.databind.ObjectMapper;
+import trady.com.backend.global.kiwoom.auth.KiwoomTokenProvider;
+import trady.com.backend.global.kiwoom.candle.historical.CandleClient;
+import trady.com.backend.global.kiwoom.candle.historical.dto.CandleRequest;
+import trady.com.backend.global.kiwoom.candle.historical.dto.CandleResponse;
+import trady.com.backend.global.kiwoom.error.KiwoomErrorHandler;
 
-@Slf4j
-@SpringBootTest
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/** 실제 서버에 접속하지 않고 차트 요청의 경로·인증·연속 조회 헤더를 검증한다. */
 class CandleClientTest {
-
-    @Autowired
-    private CandleClient client;
-
-    private CandleMinuteRequest reqeust1;
-    private CandleMinuteRequest reqeust5;
-    private CandleMinuteRequest reqeust15;
-
- /*   @BeforeEach
-    void setup() {
-        reqeust1 = new CandleMinuteRequest(
-                "005930",
-                "1",
-                "20261009"
-        );
-        reqeust5 = new CandleMinuteRequest(
-                "005930",
-                "5",
-                "20261009"
-        );
-        reqeust15 = new CandleMinuteRequest(
-                "005930",
-                "15",
-                "20261009"
-        );
-    }
-
-    @AfterEach
-    void end() throws InterruptedException {
-        Thread.sleep(1000);
-    }
     @Test
-    @DisplayName("1분_단일_요청_응답시간_측정")
-    void get1mSingleKiwoomStockCandle() throws InterruptedException {
-        long start = System.nanoTime();
-
-        CandleResponse response = client.getKiwoomStockCandle(reqeust1, "N").getBody();
-
-        double elapsedMs = (System.nanoTime() - start) / 1_000_000.0;
-
-        assertNotNull(response);
-
-        log.info("1회 요청 소요 시간: {}ms", elapsedMs);
-        log.info("응답 객체 크기: {}",response.list().size());
-        log.info("응답 : {}",response);
-
+    void sendsFirstPageRequestWithTokenAndChartTr() {
+        request("N", "ka10080", "1", "N", "");
     }
 
     @Test
-    @DisplayName("5분_단일_요청_응답시간_측정")
-    void get5mSingleKiwoomStockCandle() throws InterruptedException {
-        long start = System.nanoTime();
-
-        CandleResponse response = client.getKiwoomStockCandle(reqeust5, "N").getBody();
-
-        double elapsedMs = (System.nanoTime() - start) / 1_000_000.0;
-
-        assertNotNull(response);
-
-        log.info("1회 요청 소요 시간: {}ms", elapsedMs);
-        log.info("응답 객체 크기: {}",response.list().size());
-        log.info("응답 : {}",response);
-
+    void sendsContinuationCursorUsingTheSameChartEndpoint() {
+        request("page-2", "ka10082", "1w", "Y", "page-2");
     }
 
-    @Test
-    @DisplayName("15분_단일_요청_응답시간_측정")
-    void get15mSingleKiwoomStockCandle() throws InterruptedException {
-        long start = System.nanoTime();
-
-        CandleResponse response = client.getKiwoomStockCandle(reqeust15, "N").getBody();
-
-        double elapsedMs = (System.nanoTime() - start) / 1_000_000.0;
-
-        assertNotNull(response);
-
-        log.info("1회 요청 소요 시간: {}ms", elapsedMs);
-        log.info("응답 객체 크기: {}",response.list().size());
-        log.info("응답 : {}",response);
-
+    private void request(String nextKey, String tr, String interval, String expectedContinuation, String expectedKey) {
+        var provider = mock(KiwoomTokenProvider.class);
+        when(provider.getToken()).thenReturn("test-token");
+        var webClient = WebClient.builder().baseUrl("https://kiwoom.test")
+                .exchangeFunction(request -> {
+                    assertThat(request.url().getPath()).isEqualTo("/api/dostk/chart");
+                    assertThat(request.headers().getFirst("Authorization")).isEqualTo("Bearer test-token");
+                    assertThat(request.headers().getFirst("api-id")).isEqualTo(tr);
+                    assertThat(request.headers().getFirst("cont-yn")).isEqualTo(expectedContinuation);
+                    assertThat(request.headers().getFirst("next-key")).isEqualTo(expectedKey);
+                    return Mono.just(ClientResponse.create(HttpStatus.OK)
+                            .header("Content-Type", "application/json")
+                            .body("{\"return_code\":0,\"stk_cd\":\"005930\",\"stk_min_pole_chart_qry\":[]}")
+                            .build());
+                }).build();
+        var client = new CandleClient(webClient, provider, new KiwoomErrorHandler(new ObjectMapper()));
+        var response = client.request(new CandleRequest("005930", "20261125", interval), nextKey, tr, CandleResponse.class);
+        assertThat(response.getBody().getReturnCode()).isZero();
+        assertThat(response.getBody().getStockCode()).isEqualTo("005930");
     }
-
-    @Test
-    @DisplayName("15분_초당_1회_요청_응답시간_측정")
-    void get15mSinglePerSecondKiwoomStockCandle() throws InterruptedException {
-        measureRequests(10, 1000);
-
-    }
-
-    @Test
-    @DisplayName("15분_초당_2회_요청_응답시간_측정")
-    void get15mMultiKiwoomStockCandle() throws InterruptedException {
-        assertThrows(WebClientResponseException.TooManyRequests.class,
-                () -> measureRequests(10, 500));
-
-    }
-
-    private void measureRequests(int count, long intervalMs)
-            throws InterruptedException {
-
-        double sum = 0;
-        long previousStart = 0;
-
-        for (int i = 0; i < count; i++) {
-            // 이전 요청 시작 시점부터 지정한 간격만큼 기다린다.
-            if (i > 0) {
-                long remainingNanos = intervalMs * 1_000_000L
-                        - (System.nanoTime() - previousStart);
-
-                if (remainingNanos > 0) {
-                    TimeUnit.NANOSECONDS.sleep(remainingNanos);
-                }
-            }
-
-            long start = System.nanoTime();
-            previousStart = start;
-
-            CandleResponse response =
-                    client.getKiwoomStockCandle(reqeust15, "N").getBody();
-
-            double elapsedMs =
-                    (System.nanoTime() - start) / 1_000_000.0;
-
-            assertNotNull(response);
-            sum += elapsedMs;
-
-            log.info("{}회 요청 소요 시간: {}ms", i + 1, elapsedMs);
-            log.info("응답 객체 크기: {}",response.list().size());
-        }
-
-        log.info("{}회 평균 요청 소요 시간: {}ms", count, sum / count);
-    }*/
-
 }

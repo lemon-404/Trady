@@ -7,7 +7,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import trady.com.backend.candle.repository.CandleRepository;
 import trady.com.backend.stock.entity.Stock;
-import trady.com.backend.global.kiwoom.candle.dto.CandleResponse.CandleItem;
+import trady.com.backend.global.kiwoom.candle.historical.dto.CandleResponse.CandleItem;
 import trady.com.backend.stock.repository.StockQueryRepository;
 import java.time.LocalDateTime;
 import java.util.List;

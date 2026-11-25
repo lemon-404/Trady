@@ -3,6 +3,7 @@ package trady.com.backend.candle.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -14,8 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 import trady.com.backend.candle.dto.CandleContinuousQueryRequest;
-import trady.com.backend.candle.dto.CandleContinuousQueryResponse;
-import trady.com.backend.candle.repository.CandleQueryRepositoryV1;
+import trady.com.backend.candle.repository.CandleQueryRepository;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -35,12 +35,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * application.properties의 PostgreSQL에 이미 적재된 데이터로 조회 시간을 측정한다.
- * IDE의 JUnit 실행으로 개별 실행한다. 기본 테스트 제외 태그는 candle-performance이다.
+ * TRADY_DB_TESTS=true를 지정하여 IDE 또는 Gradle에서 개별 실행한다.
  * 데이터 생성·삭제와 키움 호출·Runner 실행은 하지 않는다.
  * 측정에는 Service 트랜잭션·DB 조회·DTO 구성이 포함되며 HTTP·JSON 직렬화는 제외한다.
  * 동일 DB 데이터와 환경에서 반복 비교한다. 워밍업은 DB 캐시를 초기화하지 않는다.
  */
 @Tag("candle-performance")
+@EnabledIfEnvironmentVariable(named = "TRADY_DB_TESTS", matches = "true")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DataJpaTest(showSql = false, properties = {
         "spring.jpa.hibernate.ddl-auto=validate",
@@ -49,7 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "logging.level.org.hibernate.orm.jdbc.bind=OFF"
 })
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(CandleQueryServiceV1.class)
+@Import(CandleQueryService.class)
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class CandleQueryServiceV1PerformanceTest {
     private static final String STOCK_CODE = "005930";
@@ -64,7 +65,7 @@ class CandleQueryServiceV1PerformanceTest {
     private final Map<String, Path> resultFiles = new LinkedHashMap<>();
 
     @Autowired
-    CandleQueryServiceV1 service;
+    CandleQueryService service;
     @Autowired DataSource dataSource;
 
     @BeforeEach
@@ -80,13 +81,13 @@ class CandleQueryServiceV1PerformanceTest {
     void measureInitialRequest(String interval) throws IOException {
         var request = new CandleContinuousQueryRequest(STOCK_CODE, interval, UPPER);
         for (int i = 0; i < WARMUP_COUNT; i++) {
-            assertThat(service.getInitialCandles(request).candles()).as("측정 대상 데이터 필요").isNotEmpty();
+            assertThat(service.getCandles(request).candles()).as("측정 대상 데이터 필요").isNotEmpty();
         }
         List<Double> times = new ArrayList<>();
         List<Map<String, Object>> measurements = new ArrayList<>();
         for (int i = 1; i <= MEASUREMENT_COUNT; i++) {
             long start = System.nanoTime();
-            var response = service.getInitialCandles(request);
+            var response = service.getCandles(request);
             double ms = elapsedMs(start);
             times.add(ms);
             measurements.add(Map.of("sequence", i, "elapsedMs", ms,
@@ -105,81 +106,6 @@ class CandleQueryServiceV1PerformanceTest {
         saveResults("1. 단일 조회", initialResults);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"1", "5", "15"})
-    @DisplayName("2026-10-09부터 2025-10-08까지 페이지별 연속 조회 시간을 측정한다")
-    void measureContinuousRequestsWithinRange(String interval) throws IOException {
-        var initialRequest = new CandleContinuousQueryRequest(STOCK_CODE, interval, UPPER);
-        for (int i = 0; i < WARMUP_COUNT; i++) {
-            assertThat(service.getInitialCandles(initialRequest).candles()).as("측정 대상 데이터 필요").isNotEmpty();
-        }
-        List<Double> times = new ArrayList<>();
-        List<Map<String, Object>> measurements = new ArrayList<>();
-        LocalDateTime cursor = UPPER;
-        int page = 1;
-        long inRangeCount = 0;
-        LocalDateTime oldest = null;
-        String stopReason;
-        while (true) {
-            var request = new CandleContinuousQueryRequest(STOCK_CODE, interval, cursor);
-            long start = System.nanoTime();
-            CandleContinuousQueryResponse response = page == 1
-                    ? service.getInitialCandles(request)
-                    : service.getContinuousCandles(request);
-            double ms = elapsedMs(start);
-            times.add(ms);
-            var items = response.candles();
-            long pageInRangeCount = items.stream().filter(item -> !item.time().isBefore(LOWER)
-                    && !item.time().isAfter(UPPER)).count();
-            var measurement = new LinkedHashMap<String, Object>();
-            measurement.put("page", page);
-            measurement.put("requestType", page == 1 ? "initial" : "continuous");
-            measurement.put("cursor", cursor);
-            measurement.put("elapsedMs", ms);
-            measurement.put("returnedCount", items.size());
-            measurement.put("inRangeCount", pageInRangeCount);
-            measurement.put("oldestTime", items.isEmpty() ? null : items.get(0).time());
-            measurement.put("newestTime", items.isEmpty() ? null : items.get(items.size() - 1).time());
-            measurement.put("nextCursor", response.nextCursor());
-            measurement.put("contYn", response.contYn());
-            measurements.add(measurement);
-            System.out.printf("%s분봉 %s %d페이지: %.3fms, 반환 %d개%n",
-                    interval, page == 1 ? "최초" : "연속", page, ms, items.size());
-            if (items.isEmpty()) {
-                assertThat(page).as("측정 대상 데이터 필요").isGreaterThan(1);
-                stopReason = "data-exhausted";
-                break;
-            }
-            oldest = items.get(0).time();
-            inRangeCount += pageInRangeCount;
-            if (!oldest.isAfter(LOWER)) {
-                stopReason = "range-start-reached";
-                break;
-            }
-            if ("N".equals(response.contYn())) {
-                assertThat(response.nextCursor()).isNull();
-                stopReason = "data-exhausted";
-                break;
-            }
-            assertThat(response.contYn()).isEqualTo("Y");
-            assertThat(response.nextCursor()).isNotNull().isBefore(cursor).isEqualTo(oldest);
-            cursor = response.nextCursor();
-            page++;
-        }
-        printSummary(interval + "분봉 전체 페이지", times);
-        System.out.printf("대상=%s, 요청 범위=%s ~ %s, 범위 내 %d개, 마지막 페이지 최저시각=%s, 종료=%s%n",
-                STOCK_CODE, LOWER, UPPER, inRangeCount, oldest, stopReason);
-        var result = commonResult(interval);
-        result.put("rangeStart", LOWER);
-        result.put("rangeEnd", UPPER);
-        result.put("pageCount", times.size());
-        result.put("pages", measurements);
-        result.put("totalInRangeCount", inRangeCount);
-        result.put("stopReason", stopReason);
-        result.put("statistics", statistics(times));
-        continuousResults.add(result);
-        saveResults("2. 기간 연속 조회", continuousResults);
-    }
 
     private double elapsedMs(long start) {
         return (System.nanoTime() - start) / 1_000_000.0;
@@ -227,15 +153,13 @@ class CandleQueryServiceV1PerformanceTest {
         if (!Files.isRegularFile(backend.resolve("build.gradle"))) {
             throw new IOException("프로젝트 루트 또는 backend 폴더에서 테스트를 실행하세요.");
         }
-        String repositoryVersion = CandleQueryRepositoryV1.class.getSimpleName();
-        String serviceVersion = CandleQueryServiceV1.class.getSimpleName();
+        String repositoryVersion = CandleQueryRepository.class.getSimpleName();
+        String serviceVersion = CandleQueryService.class.getSimpleName();
         Path file = resultFiles.get(mode);
         if (file == null) {
             Path directory = backend.resolve("docs/performance/candle-query").resolve(mode);
             Files.createDirectories(directory);
-            String name = "Repo" + repositoryVersion.substring(repositoryVersion.lastIndexOf('V'))
-                    + "-Service" + serviceVersion.substring(serviceVersion.lastIndexOf('V'))
-                    + "-" + measuredAt.format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+            String name = reportName(repositoryVersion, serviceVersion, measuredAt);
             file = directory.resolve(name + ".json");
             if (Files.exists(file)) {
                 file = directory.resolve(name + "-" + measuredAt.format(DateTimeFormatter.ofPattern("SSS"))
@@ -253,6 +177,11 @@ class CandleQueryServiceV1PerformanceTest {
         String json = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(document);
         Files.writeString(file, json + System.lineSeparator(), StandardOpenOption.TRUNCATE_EXISTING);
         System.out.println("성능 측정 결과 저장: " + file);
+    }
+
+    static String reportName(String repositoryName, String serviceName, ZonedDateTime measuredAt) {
+        return repositoryName + "-" + serviceName + "-"
+                + measuredAt.format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
     }
 
 }

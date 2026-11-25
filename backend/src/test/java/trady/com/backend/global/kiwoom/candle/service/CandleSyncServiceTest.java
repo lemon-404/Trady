@@ -3,10 +3,14 @@ package trady.com.backend.global.kiwoom.candle.service;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import trady.com.backend.global.kiwoom.candle.historical.service.CandleSyncService;
+import trady.com.backend.global.kiwoom.watchlist.WatchlistService;
 import trady.com.backend.stock.entity.Stock;
 import trady.com.backend.stock.repository.StockQueryRepository;
 
@@ -17,8 +21,12 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
-@SpringBootTest(properties = "candle.sync-setup=false")
+// 실제 DB에 저장하고 키움 API를 호출하는 수동 테스트: KIWOOM_LIVE_TESTS=true로 개별 실행한다.
+@EnabledIfEnvironmentVariable(named = "KIWOOM_LIVE_TESTS", matches = "true")
+@SpringBootTest(properties = {"candle.sync-setup=false", "kiwoom.candle.realtime.enabled=false"})
 class CandleSyncServiceTest {
+    @MockitoBean
+    private WatchlistService backgroundWatchlistService;
     @Autowired
     private CandleSyncService candleSyncService;
     @Autowired
@@ -27,13 +35,13 @@ class CandleSyncServiceTest {
     private EntityManager entityManager;
 
     @Test
-    void 월봉_수집_소요시간_측정() {
+    void 주봉_수집_소요시간_측정() {
         Stock stock = stockQueryRepository.findByCode("005930")
                 .orElseThrow(() -> new IllegalStateException("DB에 종목 005930을 먼저 등록하세요."));
         log.info("주식 코드: {}, 주식 명: {}", stock.getCode(), stock.getName());
         LocalDateTime startedAt = LocalDateTime.now();
         long startedNanos = System.nanoTime();
-        System.out.printf("연봉 수집 시작: %s, 종목: %s%n", startedAt, stock.getCode());
+        System.out.printf("주봉 수집 시작: %s, 종목: %s%n", startedAt, stock.getCode());
         try {
             // 서비스의 RateLimiter와 next-key 연속조회를 그대로 사용한다.
 //            ReflectionTestUtils.invokeMethod(candleSyncService,
@@ -60,6 +68,6 @@ class CandleSyncServiceTest {
                 .setParameter("id", stock.getId())
                 .setParameter("interval", "1w")
                 .getSingleResult();
-        assertTrue(count > 0, () -> "연봉 저장 결과가 없습니다: " + stock.getCode());
+        assertTrue(count > 0, () -> "주봉 저장 결과가 없습니다: " + stock.getCode());
     }
 }

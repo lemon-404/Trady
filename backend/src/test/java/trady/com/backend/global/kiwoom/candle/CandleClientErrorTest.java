@@ -9,8 +9,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 import tools.jackson.databind.ObjectMapper;
 import trady.com.backend.global.kiwoom.auth.KiwoomTokenProvider;
-import trady.com.backend.global.kiwoom.candle.dto.CandleRequest;
-import trady.com.backend.global.kiwoom.candle.dto.CandleResponse;
+import trady.com.backend.global.kiwoom.candle.historical.CandleClient;
+import trady.com.backend.global.kiwoom.candle.historical.dto.CandleRequest;
+import trady.com.backend.global.kiwoom.candle.historical.dto.CandleResponse;
 import trady.com.backend.global.kiwoom.error.KiwoomApiException;
 import trady.com.backend.global.kiwoom.error.KiwoomErrorHandler;
 
@@ -25,7 +26,7 @@ class CandleClientErrorTest {
         var client = client(HttpStatus.OK, MediaType.APPLICATION_JSON,
                 "{\"return_code\":2,\"return_msg\":\"[1700: 요청 제한]\"}");
 
-        var error = catchThrowableOfType(() -> request(client), KiwoomApiException.class);
+        var error = catchThrowableOfType(KiwoomApiException.class, () -> request(client));
 
         assertThat(error.getReturnCode()).isEqualTo("2");
         assertThat(error.getErrorCode()).isEqualTo("1700");
@@ -35,7 +36,7 @@ class CandleClientErrorTest {
     void preservesHttpFailureWhenBodyIsHtml() {
         var client = client(HttpStatus.BAD_GATEWAY, MediaType.TEXT_HTML, "<html>error</html>");
 
-        var error = catchThrowableOfType(() -> request(client), KiwoomApiException.class);
+        var error = catchThrowableOfType(KiwoomApiException.class, () -> request(client));
 
         assertThat(error.getCause()).isInstanceOf(WebClientResponseException.class);
         assertThat(((WebClientResponseException) error.getCause()).getStatusCode())
