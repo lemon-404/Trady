@@ -10,6 +10,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import trady.com.backend.global.kiwoom.candle.historical.service.CandleSyncService;
+import trady.com.backend.candle.domain.CandleInterval;
 import trady.com.backend.global.kiwoom.watchlist.WatchlistService;
 import trady.com.backend.stock.entity.Stock;
 import trady.com.backend.stock.repository.StockQueryRepository;
@@ -45,12 +46,11 @@ class CandleSyncServiceTest {
         try {
             // 서비스의 RateLimiter와 next-key 연속조회를 그대로 사용한다.
 //            ReflectionTestUtils.invokeMethod(candleSyncService,
-//                    "syncCandlesForInterval", "ka10082", "1w", stock);
+//                    "syncCandlesForInterval", "ka11082", "1w", stock);
             ReflectionTestUtils.invokeMethod(
                     candleSyncService,
                     "syncCandlesForInterval",
-                    "ka10082",
-                    "1w",
+                    CandleInterval.WEEK,
                     stock
             );
 
@@ -66,7 +66,7 @@ class CandleSyncServiceTest {
         Long count = entityManager.createQuery(
                 "select count(c) from Candle c where c.stock.id = :id and c.interval = :interval", Long.class)
                 .setParameter("id", stock.getId())
-                .setParameter("interval", "1w")
+                .setParameter("interval", CandleInterval.WEEK)
                 .getSingleResult();
         assertTrue(count > 0, () -> "주봉 저장 결과가 없습니다: " + stock.getCode());
     }

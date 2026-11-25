@@ -28,18 +28,18 @@ class RealtimeCandleRateLimiterTest {
     void expiresEachRequestExactlyOneSecondAfterItsAdmission() {
         var now = new AtomicLong();
         var limiter = new RealtimeCandleRateLimiter(now::get);
-        assertThat(limiter.tryAcquire("ka10080")).isTrue();
+        assertThat(limiter.tryAcquire("ka11080")).isTrue();
         now.set(500_000_000L);
-        for (int i = 0; i < 4; i++) assertThat(limiter.tryAcquire("ka10080")).isTrue();
+        for (int i = 0; i < 4; i++) assertThat(limiter.tryAcquire("ka11080")).isTrue();
 
         now.set(999_999_999L);
-        assertThat(limiter.tryAcquire("ka10080")).isFalse();
+        assertThat(limiter.tryAcquire("ka11080")).isFalse();
         now.set(1_000_000_000L);
-        assertThat(limiter.tryAcquire("ka10080")).isTrue();
-        assertThat(limiter.tryAcquire("ka10080")).isFalse();
+        assertThat(limiter.tryAcquire("ka11080")).isTrue();
+        assertThat(limiter.tryAcquire("ka11080")).isFalse();
         now.set(1_500_000_000L);
-        for (int i = 0; i < 4; i++) assertThat(limiter.tryAcquire("ka10080")).isTrue();
-        assertThat(limiter.tryAcquire("ka10080")).isFalse();
+        for (int i = 0; i < 4; i++) assertThat(limiter.tryAcquire("ka11080")).isTrue();
+        assertThat(limiter.tryAcquire("ka11080")).isFalse();
     }
 
     @Test
@@ -48,7 +48,7 @@ class RealtimeCandleRateLimiterTest {
         var executor = Executors.newFixedThreadPool(8);
         try {
             List<Callable<Boolean>> requests = IntStream.range(0, 100)
-                    .mapToObj(i -> (Callable<Boolean>) () -> limiter.tryAcquire("ka10080")).toList();
+                    .mapToObj(i -> (Callable<Boolean>) () -> limiter.tryAcquire("ka11080")).toList();
             int accepted = 0;
             for (var result : executor.invokeAll(requests, 5, TimeUnit.SECONDS)) {
                 if (result.get()) accepted++;

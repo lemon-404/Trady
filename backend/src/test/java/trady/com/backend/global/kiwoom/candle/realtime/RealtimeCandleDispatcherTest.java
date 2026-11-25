@@ -67,7 +67,7 @@ class RealtimeCandleDispatcherTest {
     void rateLimitedTasksRemainDueAndOtherTrsCanProceed() {
         var nanos = new AtomicLong();
         var limiter = new RealtimeCandleRateLimiter(nanos::get);
-        for (int i = 0; i < 5; i++) limiter.tryAcquire("ka10080");
+        for (int i = 0; i < 5; i++) limiter.tryAcquire("ka11080");
         var dispatcher = new RealtimeCandleDispatcher(stocks(1), limiter, start);
 
         assertThat(dispatcher.dispatch(start)).hasSize(4).allMatch(task -> !task.scope().minute());

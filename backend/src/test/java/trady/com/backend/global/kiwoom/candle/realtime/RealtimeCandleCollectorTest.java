@@ -75,7 +75,7 @@ class RealtimeCandleCollectorTest {
 
         verify(client, times(9)).request(argThat(request -> request.getStockCode().equals("005930")
                 && request.getBaseDt().equals("20261125") && request.getType().equals("0")), anyString(), eq("N"));
-        verify(client).request(argThat(request -> request.getInterval().equals("1")), eq("ka10080"), eq("N"));
+        verify(client).request(argThat(request -> "1".equals(request.getInterval())), eq("ka11080"), eq("N"));
         nanos.set(4_000_000_000L);
         assertThat(dispatcher.dispatch(start.plusSeconds(4))).singleElement()
                 .extracting(RealtimeCandleDispatcher.Task::scope).isEqualTo(RealtimeCandleScope.MINUTE_1);
@@ -85,8 +85,8 @@ class RealtimeCandleCollectorTest {
     void onePendingResponseDoesNotBlockOtherScopesAndItsKeyRemainsBusy() {
         var pending = Sinks.<ResponseEntity<CandleResponse>>one();
         when(client.request(any(), anyString(), anyString())).thenAnswer(call ->
-                call.<String>getArgument(1).equals("ka10080")
-                        && call.<trady.com.backend.global.kiwoom.candle.historical.dto.CandleRequest>getArgument(0).getInterval().equals("1")
+                call.<String>getArgument(1).equals("ka11080")
+                        && "1".equals(call.<trady.com.backend.global.kiwoom.candle.historical.dto.CandleRequest>getArgument(0).getInterval())
                         ? pending.asMono() : Mono.just(response()));
 
         collector.collect();

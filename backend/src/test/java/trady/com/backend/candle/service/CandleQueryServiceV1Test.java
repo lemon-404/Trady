@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import;
 import tools.jackson.databind.ObjectMapper;
 import trady.com.backend.candle.dto.CandleContinuousQueryRequest;
 import trady.com.backend.candle.dto.CandleContinuousQueryResponse;
+import trady.com.backend.candle.config.CandleQueryProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,10 +23,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(CandleQueryService.class)
 class CandleQueryServiceV1Test {
     private static final String STOCK_CODE = "005930";
-    private static final String INTERVAL = "15";
-    private static final int LIMIT = 26;
+    private static final String INTERVAL = "15m";
 
     @Autowired CandleQueryService service;
+    @Autowired CandleQueryProperties properties;
 
     @Test
     @DisplayName("실제 DB 최초 조회 결과를 출력한다")
@@ -42,7 +43,7 @@ class CandleQueryServiceV1Test {
         var initial = service.getCandles(new CandleContinuousQueryRequest(STOCK_CODE, INTERVAL, null));
         printResponse("최초 조회", initial);
         assertPage(initial);
-        assertThat(initial.nextCursor()).as("연속 조회를 위해 15분봉이 26개보다 많이 필요합니다.").isNotNull();
+        assertThat(initial.nextCursor()).as("연속 조회를 위해 페이지 크기보다 많은 15분봉이 필요합니다.").isNotNull();
         var response = service.getContinuousCandles(
                 new CandleContinuousQueryRequest(STOCK_CODE, INTERVAL, initial.nextCursor()));
 
@@ -54,13 +55,13 @@ class CandleQueryServiceV1Test {
 
     private void assertPage(CandleContinuousQueryResponse response) {
         assertThat(response.candles()).as("조회 대상의 기존 DB 데이터가 필요합니다.")
-                .isNotEmpty().hasSizeLessThanOrEqualTo(LIMIT);
+                .isNotEmpty().hasSizeLessThanOrEqualTo(properties.pageSize());
         assertThat(response.candles().stream().map(CandleContinuousQueryResponse.CandleItem::time).toList())
-                .isSorted().doesNotHaveDuplicates();
+                .isSortedAccordingTo(java.util.Comparator.reverseOrder()).doesNotHaveDuplicates();
         assertThat(response.contYn()).isIn("Y", "N");
         if ("Y".equals(response.contYn())) {
-            assertThat(response.candles()).hasSize(LIMIT);
-            assertThat(response.nextCursor()).isEqualTo(response.candles().get(0).time());
+            assertThat(response.candles()).hasSize(properties.pageSize());
+            assertThat(response.nextCursor()).isEqualTo(response.candles().get(response.candles().size() - 1).time());
         } else {
             assertThat(response.nextCursor()).isNull();
         }

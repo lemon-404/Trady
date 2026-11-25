@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.ToString;
 import trady.com.backend.candle.entity.Candle;
+import trady.com.backend.candle.domain.CandleInterval;
 import trady.com.backend.global.response.KiwoomBaseResponse;
 import trady.com.backend.global.util.KiwoomDateTimeFormats;
 import trady.com.backend.stock.entity.Stock;
@@ -41,7 +42,7 @@ public class CandleResponse extends KiwoomBaseResponse {
     ) {
     }
 
-    public static Candle toResponseDto(CandleItem dto, Stock stock, String interval) {
+    public static Candle toResponseDto(CandleItem dto, Stock stock, CandleInterval interval) {
 
         if (dto.time() == null || dto.time().isBlank()) {
             throw new IllegalArgumentException(

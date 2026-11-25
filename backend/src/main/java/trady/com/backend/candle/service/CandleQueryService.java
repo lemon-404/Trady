@@ -1,6 +1,7 @@
 package trady.com.backend.candle.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,20 +12,27 @@ import trady.com.backend.candle.repository.CandleQueryRepository;
 import trady.com.backend.candle.repository.CandleRepository;
 import trady.com.backend.global.kiwoom.candle.historical.dto.CandleResponse;
 import trady.com.backend.stock.entity.Stock;
+import trady.com.backend.stock.repository.StockQueryRepository;
+import trady.com.backend.candle.config.CandleQueryProperties;
+import trady.com.backend.candle.domain.CandleInterval;
+import trady.com.backend.candle.exception.InvalidCandleQueryException;
+import trady.com.backend.global.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
+@EnableConfigurationProperties(CandleQueryProperties.class)
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CandleQueryService {
     private final CandleRepository candleRepository;
     private final CandleQueryRepository candleQueryRepository;
+    private final StockQueryRepository stocks;
+    private final CandleQueryProperties properties;
 
     @Transactional
-    public void savePage(Stock stock, String interval,
+    public void savePage(Stock stock, CandleInterval interval,
                          List<CandleResponse.CandleItem> items) {
 
         List<Candle> incomingCandles = items.stream()
@@ -70,11 +78,13 @@ public class CandleQueryService {
     public CandleContinuousQueryResponse getCandles(
             CandleContinuousQueryRequest request
     ) {
-        int limit = getPageLimit(request.interval());
+        CandleInterval interval = parseInterval(request.interval());
+        requireStock(request.stockCode());
+        int limit = properties.pageSize();
 
         List<Candle> candles =  candleQueryRepository.findInitialCandles(
                 request.stockCode(),
-                request.interval(),
+                interval,
                 PageRequest.of(0, limit + 1)
         );
 
@@ -84,10 +94,15 @@ public class CandleQueryService {
     public CandleContinuousQueryResponse getContinuousCandles(
             CandleContinuousQueryRequest request
     ) {
-        int limit = getPageLimit(request.interval());
+        CandleInterval interval = parseInterval(request.interval());
+        if (request.cursor() == null) {
+            throw new InvalidCandleQueryException("cursor", "올바르지 않은 조회 기준 시각입니다.");
+        }
+        requireStock(request.stockCode());
+        int limit = properties.pageSize();
         List<Candle> candles = candleQueryRepository.findContinuousCandles(
                 request.stockCode(),
-                request.interval(),
+                interval,
                 request.cursor(),
                 PageRequest.of(0, limit + 1)
         );
@@ -105,9 +120,8 @@ public class CandleQueryService {
                 ? page.get(page.size() - 1).getTime()
                 : null;
 
-        // 차트에 전달할 목록은 시간 오름차순으로 변환.
+        // Repository의 시간 내림차순을 유지하여 최신 캔들부터 반환한다.
         List<CandleContinuousQueryResponse.CandleItem> items = page.stream()
-                .sorted(Comparator.comparing(Candle::getTime))
                 .map(candle -> new CandleContinuousQueryResponse.CandleItem(
                         candle.getTime(),
                         candle.getOpenPrice(),
@@ -125,12 +139,15 @@ public class CandleQueryService {
         );
     }
 
-    private int getPageLimit(String interval) {
-        return switch (interval) {
-            case "1" -> 390;
-            case "5" -> 78;
-            case "15" -> 26;
-            default -> throw new IllegalArgumentException("지원하지 않는 봉 주기입니다.");
-        };
+    private void requireStock(String stockCode) {
+        stocks.findByCode(stockCode).orElseThrow(() -> new ResourceNotFoundException("요청한 종목 정보가 존재하지 않습니다."));
+    }
+
+    private CandleInterval parseInterval(String code) {
+        try {
+            return CandleInterval.fromCode(code);
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidCandleQueryException("interval", "지원하지 않는 봉 단위입니다.");
+        }
     }
 }

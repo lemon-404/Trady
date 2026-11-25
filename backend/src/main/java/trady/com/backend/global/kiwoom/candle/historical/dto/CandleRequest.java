@@ -1,6 +1,7 @@
 package trady.com.backend.global.kiwoom.candle.historical.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
 @Getter
@@ -13,6 +14,7 @@ public class CandleRequest {
     String type;
 
     @JsonProperty("tic_scope")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     String interval;
 
     @JsonProperty("base_dt")
